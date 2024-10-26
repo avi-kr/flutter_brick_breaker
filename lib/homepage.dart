@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:brick_breaker/ball.dart';
 import 'package:brick_breaker/coverscreen.dart';
+import 'package:brick_breaker/gameoverscreen.dart';
 import 'package:brick_breaker/player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,11 +25,12 @@ class _HomePageState extends State<HomePage> {
   // var ballDirection = direction.DOWN;
 
   // Player variable
-  double playerX = 0;
-  double playerWidth = 0.3; // out of 3
+  double playerX = -0.2;
+  double playerWidth = 0.4; // out of 2
 
   // Game Settings
   bool hasGameStarted = false;
+  bool isGameOver = false;
 
   void startGame() {
     hasGameStarted = true;
@@ -37,9 +39,26 @@ class _HomePageState extends State<HomePage> {
       updateDirection();
       // move ball
       moveBall();
+
+      // check if player dead
+      if (isPlayerDead()) {
+        timer.cancel();
+        isGameOver = true;
+      }
     });
   }
 
+  // is player dead
+  bool isPlayerDead() {
+    // player dies if ball reaches the bottom of screen
+    if (ballY >= 1) {
+      return true;
+    }
+
+    return false;
+  }
+
+  // move ball
   void moveBall() {
     setState(() {
       if (ballDirection == direction.DOWN) {
@@ -50,9 +69,10 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  // update the direction of the ball
   void updateDirection() {
     setState(() {
-      if (ballY >= 0.9) {
+      if (ballY >= 0.9 && ballX >= playerX && ballX <= playerX + playerWidth) {
         ballDirection = direction.UP;
       } else if (ballY <= -0.9) {
         ballDirection = direction.DOWN;
@@ -101,6 +121,9 @@ class _HomePageState extends State<HomePage> {
               children: [
                 // tap to play
                 Coverscreen(hasGameStarted: hasGameStarted),
+
+                // Gamer Over Screen
+                GameOverScreen(isGameOver: isGameOver),
 
                 // Ball
                 MyBall(ballX: ballX, ballY: ballY),
