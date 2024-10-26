@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:brick_breaker/ball.dart';
+import 'package:brick_breaker/brick.dart';
 import 'package:brick_breaker/coverscreen.dart';
 import 'package:brick_breaker/gameoverscreen.dart';
 import 'package:brick_breaker/player.dart';
@@ -22,7 +23,12 @@ class _HomePageState extends State<HomePage> {
   double ballY = 0;
   var ballDirection = direction.DOWN;
 
-  // var ballDirection = direction.DOWN;
+  // Brick Variable
+  double brickX = 0;
+  double brickY = -0.9;
+  double brickWidth = 0.4; // out of 2
+  double brickHeight = 0.05; // out of 2
+  bool brickBroken = false; // out of 2
 
   // Player variable
   double playerX = -0.2;
@@ -45,7 +51,22 @@ class _HomePageState extends State<HomePage> {
         timer.cancel();
         isGameOver = true;
       }
+
+      // check if brick is hit
+      checkForBrokenBricks();
     });
+  }
+
+  void checkForBrokenBricks() {
+    // checks for when ball hits bottom of brick
+    if (ballX >= brickX &&
+        ballX <= brickX + brickWidth &&
+        ballY <= brickY + brickHeight &&
+        brickBroken == false) {
+      setState(() {
+        brickBroken = true;
+      });
+    }
   }
 
   // is player dead
@@ -132,6 +153,15 @@ class _HomePageState extends State<HomePage> {
                 MyPlayer(
                   playerX: playerX,
                   playerWidth: playerWidth,
+                ),
+
+                // Bricks
+                Brick(
+                  brickX: brickX,
+                  brickY: brickY,
+                  brickWidth: brickWidth,
+                  brickHeight: brickHeight,
+                  brickBroken: brickBroken,
                 )
               ],
             ),
